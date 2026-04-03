@@ -51,7 +51,7 @@ public class core_main {
     public static void main(String[] args) {
         
         
-    	SZSC_asset_process.checkAndCreateDB("", SZSC_protocol.DB_path);
+    	SZSC_asset_process.checkAndCreateDB(SZSC_protocol.DEFAULT_PATH_STRING, SZSC_protocol.DB_path);
     	
     	SZSC_asset_command.SZSC_DB_ini();
     	

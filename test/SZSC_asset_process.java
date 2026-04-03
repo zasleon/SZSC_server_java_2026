@@ -774,28 +774,44 @@ public class SZSC_asset_process {
 	
   	
   	
-  	public static boolean hasDBFile(String directoryPath) {
-  		java.io.File directory = new java.io.File(directoryPath);
-        
-        // 检查目录是否存在
-        if (!directory.exists() || !directory.isDirectory()) {
-            System.out.println("目录不存在或不是有效目录: " + directoryPath);
-            return false;
-        }
-        
-        // 遍历目录下的所有文件
-        java.io.File[] files = directory.listFiles();
-        if (files != null) {
-            for (java.io.File file : files) {
-                if (file.isFile() && file.getName().toLowerCase().endsWith(".db")) {
-                    System.out.println("找到.db文件: " + file.getAbsolutePath());
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
+  	public static boolean hasDBFile(String directoryPath, String fileName) {
+  	    // 如果目录路径为空或空白，使用当前目录
+  	    if (directoryPath == null || directoryPath.isBlank()) {
+  	        directoryPath = ".";
+  	    }
+  	    
+  	    java.io.File directory = new java.io.File(directoryPath);
+  	    
+  	    // 检查目录是否存在
+  	    if (!directory.exists() || !directory.isDirectory()) {
+  	        System.out.println("目录不存在或不是有效目录: " + directoryPath);
+  	        return false;
+  	    }
+  	    
+  	    // 遍历目录下的所有文件
+  	    java.io.File[] files = directory.listFiles();
+  	    if (files != null) {
+  	        for (java.io.File file : files) {
+  	            if (file.isFile()) {
+  	                String name = file.getName().toLowerCase();
+  	                // 如果有指定文件名，需要匹配文件名
+  	                if (fileName != null && !fileName.isBlank()) {
+  	                    if (name.equals(fileName.toLowerCase()) && name.endsWith(".db")) {
+  	                        System.out.println("找到.db文件: " + file.getAbsolutePath());
+  	                        return true;
+  	                    }
+  	                } 
+  	                // 如果没有指定文件名，只需要是.db文件
+  	                else if (name.endsWith(".db")) {
+  	                    System.out.println("找到.db文件: " + file.getAbsolutePath());
+  	                    return true;
+  	                }
+  	            }
+  	        }
+  	    }
+  	    
+  	    return false;
+  	}
     
     /**
      * 在指定目录创建新的.db文件
@@ -804,16 +820,19 @@ public class SZSC_asset_process {
      * @return 如果创建成功返回true，否则返回false
      */
     public static boolean createDBFile(String directoryPath, String dbFileName) {
+    	
         try {
             // 确保目录存在
-            java.io.File dir = new java.io.File(directoryPath);
-            if (!dir.exists()) {
-                boolean created = dir.mkdirs();
-                if (!created) {
-                    System.out.println("无法创建目录: " + directoryPath);
-                    return false;
-                }
-            }
+        	if(!directoryPath.isBlank()) {
+	            java.io.File dir = new java.io.File(directoryPath);
+	            if (!dir.exists()) {
+	                boolean created = dir.mkdirs();
+	                if (!created) {
+	                    System.out.println("无法创建目录: " + directoryPath);
+	                    return false;
+	                }
+	            }
+        	}
             
             // 确保文件名以.db结尾
             if (!dbFileName.toLowerCase().endsWith(".db")) {
@@ -836,11 +855,11 @@ public class SZSC_asset_process {
     
     
     public static void checkAndCreateDB(String directoryPath, String defaultDBName) {
-        System.out.println("正在检查目录: " + directoryPath);
+        System.out.println("正在检查目录: " + directoryPath+"\\"+defaultDBName);
         
         // 检查是否有.db文件
-        if (hasDBFile(directoryPath)) {
-            System.out.println("目录中已存在.db文件，无需创建新文件。");
+        if (hasDBFile(directoryPath,defaultDBName)) {
+            System.out.println("目录中已存在"+defaultDBName+" 文件，无需创建新文件。");
         } else {
             System.out.println("目录中没有找到.db文件，正在创建新文件...");
             boolean created = createDBFile(directoryPath, defaultDBName);
